@@ -457,7 +457,7 @@ Remember: This is a voice conversation, so keep responses short and conversation
                             <div className='card-content'>
                                 <div className='relative'>
                                     <Image
-                                        src="/user-avatar.png"
+                                        src="/profile.svg"
                                         alt="user avatar"
                                         width={540}
                                         height={540}
