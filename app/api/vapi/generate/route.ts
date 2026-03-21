@@ -2,13 +2,25 @@ import {generateText} from "ai";
 import {google} from "@ai-sdk/google"
 import { getRandomInterviewCover } from "@/lib/utils";
 import { db } from "@/firebase/admin";
+import { getCurrentUser } from "@/lib/actions/auth.action";
 
 export async function GET() {
   return Response.json({ success: true, data: "Thank you!" }, { status: 200 });
 }
 
 export async function POST(request: Request) {
+  // Check authentication
+  const currentUser = await getCurrentUser();
+  if (!currentUser) {
+    return Response.json({ success: false, error: "Unauthorized" }, { status: 401 });
+  }
+
   const { type, role, level, techstack, amount, userid } = await request.json();
+
+  // Verify the userid matches the authenticated user
+  if (userid !== currentUser.id) {
+    return Response.json({ success: false, error: "Forbidden" }, { status: 403 });
+  }
 
   try {
     const { text: questions } = await generateText({
@@ -32,15 +44,15 @@ export async function POST(request: Request) {
       role, type, level,
       techstack: techstack.split(','),
       questions: JSON.parse(questions),
-      userID: userid,
+      userId: userid,
       finalized: true,
       coverImage: getRandomInterviewCover(),
       createdAt: new Date().toISOString()
     }
 
-    await db.collection("interviews").add(interview);
+    const docRef = await db.collection("interviews").add(interview);
 
-    return Response.json({ success: true}, {status: 200})
+    return Response.json({ success: true, interviewId: docRef.id }, {status: 200})
      
 
   } catch (error) {

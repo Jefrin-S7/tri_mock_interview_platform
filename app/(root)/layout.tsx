@@ -12,7 +12,7 @@ const Rootlayout = async({ children }:{ children: ReactNode }) => {
     <div className='root-layout'>
       <nav>
         <Link href="/" className='flex items-center gap-2'>
-          <Image src="/logo.svg" alt="Logo" width={38} height={32}/>
+          <Image src="/logo.svg" alt="Logo" width={38} height={32} style={{ width: 'auto', height: 'auto' }}/>
           <h2 className='text-primary-100'>NextRound.Ai</h2>
         </Link>
       </nav>

@@ -8,21 +8,38 @@ interface FormFieldProps<T extends FieldValues> {
   name: Path<T>;
   label: string;
   placeholder?: string;
-  type?: 'text' | 'email' | 'password' | 'file';
+  type?: 'text' | 'email' | 'password' | 'file' | 'number';
 
 }
 
-const FormField = ({ control, name, label, placeholder, type ="text" }: FormFieldProps<T>) => { return (
-  <Controller control={control} name={name} render={({field}) => (
-             <FormItem>
-                <FormLabel className="label">{label}</FormLabel>
-                <FormControl>
-                  <Input className="input" placeholder={placeholder} type={type} { ... field} />
-                </FormControl>
-                <FormMessage />
-             </FormItem>
-            )}
-          />);
-        };
+const FormField = <T extends FieldValues>({ control, name, label, placeholder, type ="text" }: FormFieldProps<T>) => {
+  return (
+    <Controller
+      control={control}
+      name={name}
+      render={({ field }) => {
+        const fieldProps = { ...field } as any;
+
+        if (type === 'number') {
+          fieldProps.onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+            const value = e.target.value;
+            field.onChange(value === '' ? '' : Number(value));
+          };
+          fieldProps.value = field.value ?? '';
+        }
+
+        return (
+          <FormItem>
+            <FormLabel className="label">{label}</FormLabel>
+            <FormControl>
+              <Input className="input" placeholder={placeholder} type={type} {...fieldProps} />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        );
+      }}
+    />
+  );
+};
 
 export default FormField
